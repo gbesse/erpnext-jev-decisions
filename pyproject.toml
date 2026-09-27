@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+[project]
+name = "frappe-jev-decisions"
+version = "0.1.0"
+description = "Reviewable Jev lead intent for ERPNext"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+[tool.setuptools]
+py-modules = ["jev_core"]
+[tool.setuptools.packages.find]
+include = ["frappe_jev*"]
+
+[tool.setuptools.package-data]
+frappe_jev = ["policy.json", "modules.txt"]
