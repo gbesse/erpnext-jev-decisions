@@ -11,7 +11,7 @@ class FrappeTests(unittest.TestCase):
     def test_queue_and_decision(self):
         lead = Lead(jev_request_text="Please quote 20 licenses")
         calls=[]
-        sys.modules["frappe"] = types.SimpleNamespace(enqueue=lambda *a,**k:calls.append((a,k)),get_doc=lambda *a:lead)
+        sys.modules["frappe"] = types.SimpleNamespace(enqueue=lambda *a,**k:calls.append((a,k)),get_doc=lambda *a:lead,db=types.SimpleNamespace(exists=lambda *a:False))
         try:
             queue_lead(lead)
             self.assertEqual(calls[0][1]["lead_name"],"LEAD-1")
@@ -28,10 +28,25 @@ class FrappeTests(unittest.TestCase):
     def test_erpnext_notes_table(self):
         from frappe_jev.jobs import evaluate_lead
         lead=Lead(notes=[{"note":"Please quote 20 licenses"}])
-        sys.modules["frappe"]=types.SimpleNamespace(get_doc=lambda *a:lead)
+        sys.modules["frappe"]=types.SimpleNamespace(get_doc=lambda *a:lead,db=types.SimpleNamespace(exists=lambda *a:False))
         try:
             import os
             with patch.dict(os.environ,{"TYPESAFE_API_KEY":"test"}):
                 result=evaluate_lead("LEAD-1",evaluate=lambda text,policy,key:{"outcome":"sales","probability":0.95,"policyVersion":"0.1.0","inputSha256":"abc123456789"})
             self.assertEqual(result["outcome"],"sales")
+        finally: sys.modules.pop("frappe",None)
+
+    def test_replayed_job_skips_jev_and_comment(self):
+        lead=Lead(jev_request_text="Please quote 20 licenses")
+        seen=[]
+        sys.modules["frappe"]=types.SimpleNamespace(
+            get_doc=lambda *a:lead,
+            db=types.SimpleNamespace(exists=lambda doctype,filters:seen.append((doctype,filters)) or True),
+        )
+        try:
+            result=evaluate_lead("LEAD-1",evaluate=lambda *_:self.fail("Jev must not run"))
+            self.assertEqual(result,{"skipped":"already reviewed"})
+            self.assertNotIn("comment",lead)
+            self.assertEqual(seen[0][0],"Comment")
+            self.assertIn("jev-review:0.1.0:",seen[0][1]["content"][1])
         finally: sys.modules.pop("frappe",None)
