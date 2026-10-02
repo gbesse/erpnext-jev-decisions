@@ -1,8 +1,10 @@
 # ERPNext Jev Decisions
 
-Experimental community alpha v0.1.1 · MIT.
+Experimental community alpha v0.1.2 · MIT.
 
 ## Français
+
+Exemple hors ligne : `python3 examples/offline_decisions.py` rejoue « Un prospect demande une démonstration du produit et les tarifs. » avec une réponse synthétique à forte puis faible probabilité. La faible probabilité reste en revue ; aucune clé ni requête réseau.
 
 Une app ERPNext qui évalue les notes des nouveaux Leads dans un job Frappe et ajoute un commentaire de décision. Elle ne change ni le statut ni le responsable du Lead.
 
@@ -21,6 +23,8 @@ Avant d’appeler Jev, le job vérifie si le Lead possède déjà un commentaire
 
 ## English
 
+Offline example: `python3 examples/offline_decisions.py` replays “A prospect asks for a product demonstration and pricing.” with synthetic high and low probability responses. Low probability remains in review; no key or network request.
+
 An ERPNext app that evaluates new Lead notes in a Frappe background job and adds a decision comment. It does not change the Lead status or owner.
 
 Setup:
@@ -37,6 +41,8 @@ Prefer creating a `jev_request_text` Small Text custom field on Lead. The `Lead.
 Before calling Jev, the job checks whether the Lead already has a comment for the same text and policy version. Concurrent jobs can still create duplicate comments.
 
 ## Español
+
+Ejemplo sin conexión: `python3 examples/offline_decisions.py` reproduce «Un cliente potencial solicita una demostración del producto y precios.» con respuestas sintéticas de probabilidad alta y baja. La probabilidad baja queda para revisión; no requiere clave ni red.
 
 Una aplicación ERPNext que evalúa las notas de nuevos Leads en una tarea de Frappe y añade un comentario de decisión. No cambia el estado ni el responsable del Lead.
 
